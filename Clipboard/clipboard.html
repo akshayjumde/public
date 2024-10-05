@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shared Clipboard</title>
+    <link rel="icon" href="https://www.svgrepo.com/show/535303/clipboard.svg"> <!-- Clipboard icon -->
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f4f8;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .clipboard-container {
+            width: 100%;
+            max-width: 800px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            position: relative;
+            border: 2px solid #e0e0e0;
+            overflow: hidden;
+        }
+
+        .clipboard-header {
+            font-size: 24px;
+            text-align: center;
+            font-weight: 600;
+            color: #333333;
+            margin-bottom: 20px;
+        }
+
+        .writing-area {
+            width: 100%;
+            height: 50vh;
+            font-size: 16px;
+            background-color: #f9fafb;
+            border: none;
+            padding: 20px;
+            box-sizing: border-box;
+            border-radius: 8px;
+            resize: none;
+            outline: none;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        .writing-area:focus {
+            border: 2px solid #007aff;
+        }
+
+        .clipboard-frame {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 20px;
+            background-color: #333333;
+            border-radius: 8px 8px 0 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="clipboard-container">
+        <div class="clipboard-frame"></div>
+        <div class="clipboard-header">Shared Clipboard</div>
+        <textarea class="writing-area" id="clipboardText" placeholder="Start typing..."></textarea>
+    </div>
+
+    <script type="module">
+        // Firebase imports
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+        import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+
+        // Firebase configuration
+        // Paste your firebase configuration        
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        
+        const clipboardRef = doc(db, "clipboard", "sharedText");
+
+        // Live sync textarea with Firebase
+        const clipboardText = document.getElementById('clipboardText');
+
+        // Fetch data from Firebase and keep in sync
+        onSnapshot(clipboardRef, (doc) => {
+            const data = doc.data();
+            clipboardText.value = data?.text || "";
+        });
+
+        // Update Firebase when user types
+        clipboardText.addEventListener('input', async () => {
+            await setDoc(clipboardRef, { text: clipboardText.value });
+        });
+    </script>
+</body>
+</html>
